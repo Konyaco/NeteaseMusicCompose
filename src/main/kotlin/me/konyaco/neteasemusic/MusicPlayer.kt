@@ -2,6 +2,7 @@ package me.konyaco.neteasemusic
 
 import me.konyaco.neteasemusic.MusicPlayer.ProgressListener
 import org.bytedeco.javacv.FFmpegFrameGrabber
+import org.bytedeco.javacv.Frame
 import org.bytedeco.javacv.Java2DFrameConverter
 import java.awt.image.BufferedImage
 import java.io.File
@@ -44,15 +45,16 @@ class MusicPlayer {
         }
 
         private fun parseCoverImage() {
-            val frame = grabber.grab()
+            val frame = grabber.grabImage()
             if (frame != null) coverImage = Java2DFrameConverter().convert(frame)
+            jump(0)
         }
 
         private fun parseMetadata() {
             val metadata = grabber.getMetadata(Charsets.UTF_8)
-            artist = metadata["ARTIST"]
-            title = metadata["TITLE"]
-            album = metadata["ALBUM"]
+            artist = metadata["ARTIST"] ?: metadata["artist"]
+            title = metadata["TITLE"] ?: metadata["title"]
+            album = metadata["ALBUM"] ?: metadata["album"]
             durationMillis = grabber.lengthInTime / 1000L
         }
 
@@ -88,14 +90,20 @@ class MusicPlayer {
                         }
                     }
                     val frame = grabber.grab()
-                    val sample = frame.samples?.firstOrNull() as? ShortBuffer
-                        ?: return@thread // Play end
-                    val byteBuffer = ByteBuffer.allocate(sample.capacity() * 2)
-                    for (i in 0 until sample.capacity()) {
-                        byteBuffer.putShort(sample.get(i))
+                    if (frame == null) {
+
+                        return@thread // Play end
                     }
-                    soundLine.write(byteBuffer.array(), 0, byteBuffer.capacity())
-                    listener.onProgress(frame.timestamp / 1000L, durationMillis)
+                    if (frame.types.contains(Frame.Type.AUDIO)) {
+                        val sample = frame.samples.firstOrNull() as? ShortBuffer
+                            ?: return@thread // Play end
+                        val byteBuffer = ByteBuffer.allocate(sample.capacity() * 2)
+                        for (i in 0 until sample.capacity()) {
+                            byteBuffer.putShort(sample.get(i))
+                        }
+                        soundLine.write(byteBuffer.array(), 0, byteBuffer.capacity())
+                        listener.onProgress(frame.timestamp / 1000L, durationMillis)
+                    }
                 }
                 soundLine.close()
             }
