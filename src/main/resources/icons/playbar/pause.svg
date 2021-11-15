@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="pause">
+    <title>icon24-play-pause</title>
+    <path d="m0 0h24v24h-24z" fill="none"/>
+    <path clip-rule="evenodd"
+          d="m9.4 6c.3 0 .6.3.6.6v10.8c0 .3-.3.6-.6.6h-1.8c-.3 0-.6-.3-.6-.6v-10.8c0-.3.3-.6.6-.6zm7 0c.3 0 .6.3.6.6v10.8c0 .3-.3.6-.6.6h-1.8c-.3 0-.6-.3-.6-.6v-10.8c0-.3.3-.6.6-.6z"
+          fill-opacity=".8" fill-rule="evenodd"/>
+</svg>

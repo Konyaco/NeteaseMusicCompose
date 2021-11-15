@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="fm">
+    <title>play_local</title>
+    <clipPath id="play_local-a">
+        <path d="m79-300h18c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2z"/>
+    </clipPath>
+    <clipPath id="play_local-b">
+        <path d="m-580-383h1180v780h-1180z"/>
+    </clipPath>
+    <clipPath id="play_local-c">
+        <path d="m67-310h42v32h-42z"/>
+    </clipPath>
+    <clipPath id="play_local-d">
+        <path d="m77-300h22v12h-22z"/>
+    </clipPath>
+    <clipPath id="play_local-e">
+        <path d="m79-300h18c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2z"/>
+    </clipPath>
+    <clipPath id="play_local-f">
+        <path d="m-580-383h1180v780h-1180z"/>
+    </clipPath>
+    <clipPath id="play_local-g">
+        <path d="m67-310h42v32h-42z"/>
+    </clipPath>
+    <clipPath id="play_local-h">
+        <path d="m77-300h22v12h-22z"/>
+    </clipPath>
+    <path d="m22 6h-20c-.5 0-.9.4-1 .9v.1 8c0 .5.4.9.9 1h.1 20c.5 0 .9-.4 1-.9v-.1-8c0-.5-.4-.9-.9-1zm0-1c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2h-20c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2z"/>
+    <g clip-path="url(#play_local-a)">
+        <g clip-path="url(#play_local-b)" enable-background="new">
+            <g clip-path="url(#play_local-c)">
+                <path clip-path="url(#play_local-d)"
+                      d="m79-300h18c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2z"
+                      fill="none" stroke="#ff3a3a" stroke-miterlimit="10" stroke-width="2"/>
+            </g>
+        </g>
+    </g>
+    <g clip-path="url(#play_local-e)">
+        <g clip-path="url(#play_local-f)" enable-background="new">
+            <g clip-path="url(#play_local-g)">
+                <path clip-path="url(#play_local-h)"
+                      d="m79-300h18c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2z"
+                      fill="none" stroke="#ff3a3a" stroke-miterlimit="10" stroke-width="2"/>
+            </g>
+        </g>
+    </g>
+    <path d="m9.2 9.7c.6 1.3 1.5 2.5 2.5 3.3-.3.2-.7.6-.8.9-.3-.3-.7-.6-1-.9v.8h-1.8v1.5h-1.2v-1.5h-1.9v-.8c-.3.4-.7.7-1 1-.2-.3-.5-.7-.8-.9 1-.7 2-2 2.5-3.4h-2.1v-1.1h3.4v-1.7h1.1v1.7h3.4v1.1zm-2.3 3v-3c-.4 1.1-.9 2.1-1.6 3zm2.8 0c-.6-.8-1.2-1.9-1.6-3v3z"/>
+    <path d="m14.4 12.1c.3-.1.6-.2.8-.4l.2.9c-1 .5-2 1-2.8 1.3l-.4-1.1c.3-.1.7-.3 1.2-.5v-2.3h-1.1v-1h1.1v-2h1v2h.9v1h-.9zm4.8 2.1c.5 0 .6-.2.7-1.1.2.2.6.3.9.4-.1 1.3-.5 1.7-1.5 1.7h-1.9c-1.2 0-1.6-.3-1.6-1.6v-2.3l-.5.2-.4-1 .9-.4v-2.4h1v1.9l.7-.3v-2.4h1v2.1l.7-.3.2-.1.2-.1.7.3v.2c0 1.7 0 2.8-.1 3.2 0 .4-.2.6-.5.7s-.6.1-.9.1c0-.3-.1-.7-.2-.9h.4c.1 0 .2 0 .2-.2 0-.1 0-.8 0-2.1l-.6.2v3.2h-1v-2.7l-.7.3v2.8c0 .5.1.6.6.6z"/>
+</svg>
