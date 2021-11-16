@@ -2,11 +2,8 @@ package me.konyaco.neteasemusic.ui
 
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
-import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
@@ -19,10 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -40,12 +40,13 @@ import kotlin.math.roundToInt
 
 @Composable
 fun PlayBar(
-    viewModel: ViewModel
+    viewModel: ViewModel,
+    onAlbumImageClick: () -> Unit
 ) {
     val playingState by viewModel.playingState.collectAsState()
     val playMode by viewModel.playMode.collectAsState()
 
-    Box(Modifier.fillMaxWidth().height(72.dp)) {
+    Box(Modifier.background(Color.White).fillMaxWidth().height(72.dp)) {
         Divider(Modifier.fillMaxWidth().height(1.dp))
 
         Box(Modifier.align(Alignment.CenterStart)) {
@@ -56,7 +57,8 @@ fun PlayBar(
                     it.songInfo.author,
                     liked = liked,
                     { liked = it },
-                    playingState?.cover?.collectAsState()?.value
+                    playingState?.cover?.collectAsState()?.value,
+                    onAlbumImageClick = onAlbumImageClick
                 )
             }
         }
@@ -87,31 +89,21 @@ fun PlayBar(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun SongInfo(
     name: String,
     author: String,
     liked: Boolean,
     onLikeStateChange: (Boolean) -> Unit,
-    cover: Painter?
+    cover: Painter?,
+    onAlbumImageClick: () -> Unit
 ) {
     Row(
         Modifier.fillMaxHeight().width(280.dp).padding(start = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Album Cover Image
-        Box(Modifier.clip(RoundedCornerShape(4.dp)).size(48.dp).background(Color.Black.copy(0.08f))) {
-            androidx.compose.animation.AnimatedVisibility(visible = cover != null, enter = fadeIn(), exit = fadeOut()) {
-                cover?.let {
-                    Image(
-                        painter = it,
-                        modifier = Modifier.fillMaxSize(),
-                        contentDescription = "Cover image of song",
-                        contentScale = ContentScale.Crop
-                    )
-                }
-            }
-        }
+        AlbumButton(cover, onAlbumImageClick)
         Spacer(Modifier.width(12.dp))
         // Song title and artist
         Column {
@@ -140,6 +132,56 @@ private fun SongInfo(
                 color = Color.Black.copy(0.75f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun AlbumButton(albumImage: Painter?, onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    // Album Cover Image
+    Box(
+        Modifier.clip(RoundedCornerShape(4.dp))
+            .size(48.dp)
+            .background(Color.Black.copy(0.08f))
+            .clickable(
+                interactionSource = interactionSource,
+                onClick = onClick,
+                indication = LocalIndication.current
+            )
+            .pointerHoverIcon(remember { PointerIcon(Cursor(Cursor.HAND_CURSOR)) })
+    ) {
+        androidx.compose.animation.AnimatedVisibility(
+            visible = albumImage != null,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            albumImage?.let {
+                Image(
+                    painter = it,
+                    modifier = Modifier.fillMaxSize().composed {
+                        if (isHovered) {
+                            blur(2.dp)
+                        } else this
+                    },
+                    contentDescription = "Cover image of song",
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+
+        if (isHovered) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(0.24f))) // Half-transparent mask on hover
+
+            // Fold up icon
+            Image(
+                modifier = Modifier.size(28.dp).align(Alignment.Center),
+                painter = painterResource("icons/playbar/fold_up.svg"),
+                contentDescription = "Fold up",
+                colorFilter = ColorFilter.tint(Color.White.copy(0.9f))
             )
         }
     }

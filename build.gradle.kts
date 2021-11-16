@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "me.konyaco.neteasemusic"
-version = "1.0"
+version = "1.0.1"
 
 repositories {
     google()
@@ -41,7 +41,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "NeteaseMusic"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.1"
             vendor = "Konyaco"
             windows {
                 perUserInstall = true
@@ -56,11 +56,4 @@ compose.desktop {
             }
         }
     }
-}
-
-tasks.withType<org.bytedeco.gradle.javacpp.BuildTask> {
-    // set here default values for all build tasks below, typically just includePath and linkPath,
-    // but also properties to set the path to the NDK and its compiler in the case of Android
-    println("Build")
-    includeResource.forEach { println(it) }
 }

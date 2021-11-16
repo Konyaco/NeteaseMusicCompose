@@ -4,13 +4,16 @@ This is a local music player, imitates the UI of Netease Music client.
 
 The UI was built on [Jetbrains Compose](https://github.com/JetBrains/compose-jb/releases).
 
-## Screenshot
+## Screenshots
 
-![img](assets/screenshot.png)
+![img](assets/screenshot_home.png)
+
+![img](assets/screenshot_playing.png)
 
 ## Features
 
 - [x] Parse and play local musics
+  - [ ] Resizable table column
 - [x] Control music
   - [x] Pause and resume
   - [x] Control progress
@@ -20,7 +23,7 @@ The UI was built on [Jetbrains Compose](https://github.com/JetBrains/compose-jb/
   - [ ] Play mode (cycle, random, etc...)
 - [ ] Playing screen
   - [ ] Display visual scrolling lyric
-  - [ ] Animating album
+  - [x] Animating album
 - [ ] Floating lyric
 
 ## Supported music format

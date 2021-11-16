@@ -48,9 +48,9 @@ fun LocalAndDownload(viewModel: ViewModel) {
             var selected by remember { mutableStateOf(1) }
             // Tab
             Row {
-                PrimaryTab("下载管理", selected == 0, { selected = 0 })
+                PrimaryTab("下载管理", selected == 0) { selected = 0 }
                 Spacer(Modifier.width(16.dp))
-                PrimaryTab("本地音乐", selected == 1, { selected = 1 })
+                PrimaryTab("本地音乐", selected == 1) { selected = 1 }
             }
             Spacer(Modifier.height(12.dp))
             Row {
@@ -60,6 +60,7 @@ fun LocalAndDownload(viewModel: ViewModel) {
                 }, text = "选择目录", color = Color(0xFF0B58C1), fontSize = 14.sp)
             }
             Spacer(Modifier.height(32.dp))
+            // Play all songs button & Refresh button
             Row(verticalAlignment = Alignment.CenterVertically) {
                 PlayButton(onAddClick = {
                     viewModel.addAllToPlayList()
@@ -72,8 +73,10 @@ fun LocalAndDownload(viewModel: ViewModel) {
                 if (isRefreshing) CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
             }
             Spacer(Modifier.height(16.dp))
+            // Songs list
             SongList(songs = songs, onSongSelect = { viewModel.addToPlaylist(it) })
         }
+
         VerticalScrollbar(
             modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
             adapter = rememberScrollbarAdapter(scrollState)
@@ -104,6 +107,7 @@ private fun PrimaryTab(
             )
             .pointerHoverIcon(remember { PointerIcon(Cursor(Cursor.HAND_CURSOR)) })
     ) {
+        // Label
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = label,
@@ -291,7 +295,7 @@ private fun Item(
 }
 
 @Composable
-fun ChangeDirectoryDialog(onDismissRequest: () -> Unit, onConfirm: (String) -> Unit) {
+private fun ChangeDirectoryDialog(onDismissRequest: () -> Unit, onConfirm: (String) -> Unit) {
     Dialog(
         onCloseRequest = onDismissRequest,
         title = "更改目录",
