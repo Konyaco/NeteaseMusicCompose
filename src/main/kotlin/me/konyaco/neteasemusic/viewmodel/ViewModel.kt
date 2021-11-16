@@ -1,6 +1,8 @@
 package me.konyaco.neteasemusic.viewmodel
 
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.graphics.toPainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +33,7 @@ class ViewModel {
     data class PlayingState(
         val songInfo: SongInfo,
         var indexInPlayList: MutableStateFlow<Int>,
-        val cover: MutableStateFlow<Painter?>,
+        val cover: MutableStateFlow<ImageBitmap?>,
         val currentTimeStampMillis: MutableStateFlow<Long>,
         val isPlaying: MutableStateFlow<Boolean>
     )
@@ -150,9 +152,9 @@ class ViewModel {
         scope.launch {
             val song = musicPlayer.parse(localSongInfo.file)
             musicPlayer.setSong(song)
-            val cover = MutableStateFlow<Painter?>(null)
+            val cover = MutableStateFlow<ImageBitmap?>(null)
             launch {
-                cover.emit(song.coverImage?.toPainter())
+                cover.emit(song.coverImage?.toComposeImageBitmap())
             }
             val current = MutableStateFlow(0L)
             musicPlayer.setProgressListener { c, t ->

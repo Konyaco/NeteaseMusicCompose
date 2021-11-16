@@ -18,11 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -96,7 +96,7 @@ private fun SongInfo(
     author: String,
     liked: Boolean,
     onLikeStateChange: (Boolean) -> Unit,
-    cover: Painter?,
+    cover: ImageBitmap?,
     onAlbumImageClick: () -> Unit
 ) {
     Row(
@@ -139,7 +139,7 @@ private fun SongInfo(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun AlbumButton(albumImage: Painter?, onClick: () -> Unit) {
+private fun AlbumButton(albumImage: ImageBitmap?, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     // Album Cover Image
@@ -161,14 +161,15 @@ private fun AlbumButton(albumImage: Painter?, onClick: () -> Unit) {
         ) {
             albumImage?.let {
                 Image(
-                    painter = it,
+                    bitmap = it,
                     modifier = Modifier.fillMaxSize().composed {
                         if (isHovered) {
                             blur(2.dp)
                         } else this
                     },
                     contentDescription = "Cover image of song",
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    filterQuality = FilterQuality.Medium
                 )
             }
         }

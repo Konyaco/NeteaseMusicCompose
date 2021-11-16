@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
@@ -71,23 +70,17 @@ fun PlayPage(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun Content(onClose: () -> Unit, viewModel: ViewModel) {
     val songInfo by viewModel.playingState.collectAsState()
 
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.height(60.dp).padding(horizontal = 21.dp), verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                modifier = Modifier.size(24.dp).clickable(onClick = onClose, role = Role.Button, onClickLabel = "Close")
-                    .pointerHoverIcon(remember { PointerIcon(Cursor(Cursor.HAND_CURSOR)) }),
-                painter = painterResource("icons/page/play/fold_down.svg"),
-                colorFilter = ColorFilter.tint(Color.Black.copy(0.7f)),
-                contentDescription = null
-            )
+            FoldDownButton(onClose)
         }
         Box(Modifier.weight(1f).fillMaxWidth().padding(top = 32.dp)) {
             songInfo?.let { playingState ->
+                // Music title and artist
                 Column(
                     modifier = Modifier.wrapContentSize().align(Alignment.TopCenter),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -111,6 +104,7 @@ private fun Content(onClose: () -> Unit, viewModel: ViewModel) {
                     )
                 }
 
+                // Animation album and lyric
                 Row(Modifier.fillMaxHeight().fillMaxWidth(0.7f).align(Alignment.TopCenter)) {
                     Box(
                         modifier = Modifier.weight(1f).padding(top = 32.dp)
@@ -118,6 +112,7 @@ private fun Content(onClose: () -> Unit, viewModel: ViewModel) {
                         Disc(playingState.cover.collectAsState().value, playingState.isPlaying.collectAsState().value)
                     }
                     Spacer(Modifier.widthIn(64.dp))
+                    // TODO: 2021/11/16 Scrolling lyric
                     Box(
                         modifier = Modifier.weight(1f).fillMaxHeight().padding(vertical = 104.dp),
                         contentAlignment = Alignment.Center
@@ -130,8 +125,20 @@ private fun Content(onClose: () -> Unit, viewModel: ViewModel) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun Disc(cover: Painter?, playing: Boolean) {
+private fun FoldDownButton(onClick: () -> Unit) {
+    Image(
+        modifier = Modifier.size(24.dp).clickable(onClick = onClick, role = Role.Button, onClickLabel = "Close")
+            .pointerHoverIcon(remember { PointerIcon(Cursor(Cursor.HAND_CURSOR)) }),
+        painter = painterResource("icons/page/play/fold_down.svg"),
+        colorFilter = ColorFilter.tint(Color.Black.copy(0.7f)),
+        contentDescription = null
+    )
+}
+
+@Composable
+private fun Disc(cover: ImageBitmap?, playing: Boolean) {
     val transition = updateTransition(playing)
     val needleRotation by transition.animateFloat(
         transitionSpec = { tween() },
@@ -166,6 +173,7 @@ private fun Disc(cover: Painter?, playing: Boolean) {
     }
 
     Box {
+        // Needle
         Box(Modifier
             .zIndex(2f)
             .padding(start = 118.dp)
@@ -194,12 +202,13 @@ private fun Disc(cover: Painter?, playing: Boolean) {
             cover?.let {
                 Image(
                     modifier = Modifier.fillMaxSize().padding(40.dp).clip(CircleShape),
-                    painter = it,
+                    bitmap = it,
                     contentDescription = "Album cover",
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    filterQuality = FilterQuality.Medium
                 )
             }
-            // Mat
+            // Border
             Image(painterResource("res/play/play_disc.webp"), "Play disc")
             // Gray Border
             Box(
