@@ -20,7 +20,9 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
       - name: Run gradle package task
-        run: ./gradlew package --no-daemon
+        run: |
+          chmod +x gradlew
+          ./gradlew package --no-daemon
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.4
         with:
