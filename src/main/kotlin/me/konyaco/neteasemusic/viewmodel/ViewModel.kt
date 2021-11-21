@@ -1,9 +1,7 @@
 package me.konyaco.neteasemusic.viewmodel
 
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.graphics.toPainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -118,8 +116,13 @@ class ViewModel {
                         else -> false
                     }
                 } else false
-            }.map {
-                val song = musicPlayer.parse(it)
+            }.mapNotNull {
+                val song = try {
+                    musicPlayer.parse(it)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    return@mapNotNull null
+                }
                 song.release()
                 LocalSongInfo(
                     name = song.title ?: it.nameWithoutExtension,
