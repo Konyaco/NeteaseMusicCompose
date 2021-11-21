@@ -39,6 +39,7 @@ class MusicPlayer {
 
         init {
             grabber = FFmpegFrameGrabber(file)
+            grabber.charset = Charsets.UTF_8
             grabber.start()
             parseMetadata()
             parseCoverImage()
@@ -51,7 +52,7 @@ class MusicPlayer {
         }
 
         private fun parseMetadata() {
-            val metadata = grabber.getMetadata(Charsets.UTF_8)
+            val metadata = grabber.metadata
             artist = metadata["ARTIST"] ?: metadata["artist"]
             title = metadata["TITLE"] ?: metadata["title"]
             album = metadata["ALBUM"] ?: metadata["album"]
@@ -91,7 +92,7 @@ class MusicPlayer {
                     }
                     val frame = grabber.grab()
                     if (frame == null) {
-
+                        listener.onProgress(durationMillis, durationMillis)
                         return@thread // Play end
                     }
                     if (frame.types.contains(Frame.Type.AUDIO)) {
@@ -133,6 +134,15 @@ class MusicPlayer {
     }
 
     private var currentSong: Song? = null
+    private var listener: ProgressListener = ProgressListener { currentTimeMillis, totalTimeMillis -> }
+
+    fun interface ProgressListener {
+        fun onProgress(currentTimeMillis: Long, totalTimeMillis: Long)
+    }
+
+    fun setProgressListener(listener: ProgressListener) {
+        this.listener = listener
+    }
 
     fun parse(file: File): Song {
         return Song(file)
@@ -142,16 +152,6 @@ class MusicPlayer {
         currentSong?.release()
         listener.onProgress(0, song.durationMillis)
         currentSong = song
-    }
-
-    fun interface ProgressListener {
-        fun onProgress(currentTimeMillis: Long, totalTimeMillis: Long)
-    }
-
-    private var listener: ProgressListener = ProgressListener { currentTimeMillis, totalTimeMillis -> }
-
-    fun setProgressListener(listener: ProgressListener) {
-        this.listener = listener
     }
 
     fun play() {
