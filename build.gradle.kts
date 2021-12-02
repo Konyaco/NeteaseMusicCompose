@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "me.konyaco.neteasemusic"
-version = "1.0.2"
+version = "1.0.3"
 
 repositories {
     google()
@@ -40,7 +40,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "NeteaseMusic"
-            packageVersion = "1.0.2"
+            packageVersion = "1.0.3"
             vendor = "Konyaco"
             windows {
                 perUserInstall = true
