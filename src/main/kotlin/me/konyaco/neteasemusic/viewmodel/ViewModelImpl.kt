@@ -83,7 +83,7 @@ class ViewModelImpl private constructor(
         }
     }
 
-    suspend fun setCurrentSongToNext() {
+    private suspend fun setCurrentSongToNext() {
         increaseOrder()
         setMusicPlayWithCurrentSong()
     }
@@ -258,6 +258,7 @@ class ViewModelImpl private constructor(
                 config.storeMusicDir(directory)
             }
             localSongDirectory.value = directory
+            refreshLocalSongList()
         }
     }
 
