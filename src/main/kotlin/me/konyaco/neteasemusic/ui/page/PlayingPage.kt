@@ -27,13 +27,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import me.konyaco.neteasemusic.viewmodel.ViewModel
+import me.konyaco.neteasemusic.viewmodel.PlayViewModel
 import java.awt.Cursor
 import kotlin.math.roundToInt
 
 @Composable
 fun PlayPage(
-    viewModel: ViewModel,
+    viewModel: PlayViewModel,
     visible: Boolean,
     onClose: () -> Unit
 ) {
@@ -71,7 +71,7 @@ fun PlayPage(
 }
 
 @Composable
-private fun Content(onClose: () -> Unit, viewModel: ViewModel) {
+private fun Content(onClose: () -> Unit, viewModel: PlayViewModel) {
     val songInfo by viewModel.playingState.collectAsState()
 
     Column(Modifier.fillMaxSize()) {

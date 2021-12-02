@@ -34,13 +34,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.konyaco.neteasemusic.viewmodel.PlayViewModel
 import me.konyaco.neteasemusic.viewmodel.ViewModel
 import java.awt.Cursor
 import kotlin.math.roundToInt
 
 @Composable
 fun PlayBar(
-    viewModel: ViewModel,
+    viewModel: PlayViewModel,
     onAlbumImageClick: () -> Unit
 ) {
     val playingState by viewModel.playingState.collectAsState()
@@ -72,7 +73,7 @@ fun PlayBar(
                 onNextClick = { viewModel.next() },
                 onLastClick = { viewModel.previous() },
                 mode = playMode,
-                onModeClick = { viewModel.changePlayMode() },
+                onModeClick = { viewModel.rollPlayMode() },
                 lyricOn = lyricOn,
                 onLyricStateChange = { lyricOn = it },
                 isPlaying = playingState?.isPlaying?.collectAsState()?.value ?: false,

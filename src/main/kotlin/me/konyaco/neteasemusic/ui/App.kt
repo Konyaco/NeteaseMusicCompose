@@ -3,15 +3,13 @@ package me.konyaco.neteasemusic.ui
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import me.konyaco.neteasemusic.ui.page.LocalAndDownload
 import me.konyaco.neteasemusic.ui.page.PlayPage
+import me.konyaco.neteasemusic.viewmodel.LocalAndDownloadViewModel
+import me.konyaco.neteasemusic.viewmodel.PlayViewModel
 import me.konyaco.neteasemusic.viewmodel.ViewModel
 
 @Composable
@@ -27,13 +25,14 @@ fun App(viewModel: ViewModel) {
                     Row(Modifier.weight(1f).fillMaxWidth()) {
                         SideNav(Modifier.fillMaxHeight().width(200.dp))
                         Divider(Modifier.fillMaxHeight().width(1.dp))
-                        Body(Modifier.fillMaxHeight().weight(1f), viewModel)
+                        Body(Modifier.fillMaxHeight().weight(1f), viewModel as LocalAndDownloadViewModel)
                     }
                 }
-                PlayPage(viewModel, visible = displayPlayPage, onClose = { displayPlayPage = false })
+                PlayPage(viewModel as PlayViewModel, visible = displayPlayPage, onClose = { displayPlayPage = false })
             }
-            PlayBar(viewModel, onAlbumImageClick = {
-                displayPlayPage = true }
+            PlayBar(viewModel as PlayViewModel, onAlbumImageClick = {
+                displayPlayPage = true
+            }
             )
         }
     }
@@ -41,7 +40,7 @@ fun App(viewModel: ViewModel) {
 
 
 @Composable
-fun Body(modifier: Modifier, viewModel: ViewModel) {
+fun Body(modifier: Modifier, viewModel: LocalAndDownloadViewModel) {
     Box(modifier) {
         // TODO: 2021/11/14 Pages
         LocalAndDownload(viewModel)

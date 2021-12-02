@@ -9,10 +9,11 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import me.konyaco.neteasemusic.ui.App
-import me.konyaco.neteasemusic.viewmodel.ViewModel
+import me.konyaco.neteasemusic.viewmodel.ViewModelImpl
+import java.awt.Dimension
 
 fun main() = application {
-    val viewModel = remember { ViewModel(MusicPlayer()) }
+    val viewModel = remember { ViewModelImpl.getInstance() }
     Window(
         onCloseRequest = ::exitApplication,
         title = "网易云音乐",
@@ -23,7 +24,7 @@ fun main() = application {
         val width = with(density) { 1030.dp.roundToPx() }
         val height = with(density) { 680.dp.roundToPx() }
         LaunchedEffect(width, height) {
-//            window.minimumSize = Dimension(width, height)
+            window.minimumSize = Dimension(width, height)
         }
         App(viewModel)
     }

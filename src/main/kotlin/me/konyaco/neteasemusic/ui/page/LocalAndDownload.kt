@@ -29,19 +29,20 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import me.konyaco.neteasemusic.ui.sizeToText
 import me.konyaco.neteasemusic.ui.timeStampToText
+import me.konyaco.neteasemusic.viewmodel.LocalAndDownloadViewModel
 import me.konyaco.neteasemusic.viewmodel.ViewModel
 import java.awt.Cursor
 
 @OptIn(ExperimentalStdlibApi::class)
 @Composable
-fun LocalAndDownload(viewModel: ViewModel) {
+fun LocalAndDownload(viewModel: LocalAndDownloadViewModel) {
     val scrollState = rememberScrollState()
     val songs by viewModel.localSongList.collectAsState()
     val location by viewModel.localSongDirectory.collectAsState()
     var changeDirectoryDialog by remember { mutableStateOf(false) }
     val isRefreshing by viewModel.isLocalSongListRefreshing.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.refreshSongList() }
+    LaunchedEffect(Unit) { viewModel.refreshLocalSongList() }
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 32.dp, vertical = 16.dp)) {
@@ -68,7 +69,7 @@ fun LocalAndDownload(viewModel: ViewModel) {
                     viewModel.replacePlayListAndPlay()
                 })
                 Spacer(Modifier.width(12.dp))
-                RefreshButton { viewModel.refreshSongList() }
+                RefreshButton { viewModel.refreshLocalSongList() }
                 Spacer(Modifier.width(12.dp))
                 if (isRefreshing) CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
             }
