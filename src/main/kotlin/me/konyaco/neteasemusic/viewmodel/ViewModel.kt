@@ -2,23 +2,19 @@ package me.konyaco.neteasemusic.viewmodel
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import me.konyaco.neteasemusic.MusicPlayer
 import java.io.File
 import java.util.*
 
-class ViewModel {
-    private val musicPlayer = MusicPlayer()
-
+class ViewModel(private val musicPlayer: MusicPlayer) {
     val isLocalSongListRefreshing = MutableStateFlow(false)
     val localSongList: MutableStateFlow<List<LocalSongInfo>> = MutableStateFlow(emptyList())
     val localSongDirectory: MutableStateFlow<String> = MutableStateFlow(getMusicDir())
 
     val playingState = MutableStateFlow<PlayingState?>(null)
-    val playlist = MutableStateFlow<List<SongInfo>>(emptyList())
+    val playList = MutableStateFlow<List<SongInfo>>(emptyList())
 
     val playMode = MutableStateFlow(PlayMode.CYCLE)
 
@@ -26,7 +22,9 @@ class ViewModel {
         CYCLE, SINGLE_CYCLE, HEARTBEAT, LIST, RANDOM
     }
 
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.Default + CoroutineExceptionHandler { coroutineContext, throwable ->
+        throwable.printStackTrace()
+    })
 
     data class PlayingState(
         val songInfo: SongInfo,
@@ -37,17 +35,17 @@ class ViewModel {
     )
 
     open class SongInfo(
-        val name: String,
-        val author: String,
-        val album: String,
-        val totalDurationMillis: Long
+        open val name: String,
+        open val author: String,
+        open val album: String,
+        open val totalDurationMillis: Long
     )
 
-    class LocalSongInfo(
-        name: String,
-        author: String,
-        album: String,
-        totalDurationMillis: Long,
+    data class LocalSongInfo(
+        override val name: String,
+        override val author: String,
+        override val album: String,
+        override val totalDurationMillis: Long,
         val size: Long,
         val file: File
     ) : SongInfo(name, author, album, totalDurationMillis)
@@ -66,32 +64,94 @@ class ViewModel {
         return musicDir!!
     }
 
-    fun play() {
+    fun play(): Deferred<Unit> = scope.async {
+        val state = playingState.value
+        if (state == null) {
+            setSong()
+        }
         musicPlayer.play()
-        playingState.value?.isPlaying?.value = true
+        state?.isPlaying?.value = true
     }
 
-    fun pause() {
+    fun pause(): Deferred<Unit> = scope.async {
         musicPlayer.pause()
         playingState.value?.isPlaying?.value = false
     }
 
-    fun next() {
-        // TODO: 2021/11/15  
+    private var orderList: List<Int> = emptyList()
+    private var orderIndex = 0
+    private var cycle: Boolean = isCycle()
+
+    fun next(): Deferred<Unit> = scope.async {
+        orderIndex += 1
+        if (orderIndex >= orderList.size) {
+            if (cycle) {
+                orderIndex = 0
+            } else {
+                orderIndex = orderList.size - 1
+            }
+        }
+        setSong()
+        play().await()
     }
 
-    fun previous() {
-        // TODO: 2021/11/15  
+    fun previous(): Deferred<Unit> = scope.async {
+        orderIndex -= 1
+        if (orderIndex < 0) {
+            if (cycle) {
+                orderIndex = orderList.size - 1
+            } else {
+                orderIndex = 0
+            }
+        }
+        setSong()
+        play().await()
+    }
+
+    fun selectSong(song: LocalSongInfo): Deferred<Unit> = scope.async {
+        // TODO: 2021/12/2
+        val index = playList.value.indexOf(song)
+        if (index == -1) { // If not found, add playList and set the index again.
+            replacePlayList().await()
+            selectSong(song).await()
+        }
+        // If found, set orderIndex to selected song
+        orderIndex = orderList.indexOf(index)
+        setSong()
+    }
+
+    private suspend fun setSong() = coroutineScope {
+        val localSongInfo = localSongList.value[orderList[orderIndex]]
+        val song = musicPlayer.parse(localSongInfo.file)
+        musicPlayer.setSong(song)
+        val state = PlayingState(
+            songInfo = localSongInfo,
+            indexInPlayList = MutableStateFlow(0),
+            cover = MutableStateFlow(null),
+            currentTimeStampMillis = MutableStateFlow(0L),
+            isPlaying = MutableStateFlow(false)
+        )
+        launch {
+            state.cover.emit(song.coverImage?.toComposeImageBitmap())
+        }
+        musicPlayer.setProgressListener { c, t ->
+            state.currentTimeStampMillis.value = c
+            if (c == t) {
+                state.isPlaying.value = false
+                next()
+            }
+        }
+        playingState.value = state
     }
 
     private val modes = PlayMode.values()
     private var mode = 0
 
     fun changePlayMode() {
-        // TODO: 2021/11/15
         if (mode == modes.size - 1) mode = 0
         else mode += 1
         playMode.value = modes[mode]
+        parsePlayOrder()
     }
 
     fun changeProgress(progress: Float) {
@@ -150,35 +210,61 @@ class ViewModel {
         }
     }
 
-    fun addToPlaylist(localSongInfo: LocalSongInfo) {
-        // TODO: 2021/11/15 Rewrite
-        scope.launch {
-            val song = musicPlayer.parse(localSongInfo.file)
-            musicPlayer.setSong(song)
-            val cover = MutableStateFlow<ImageBitmap?>(null)
-            launch {
-                cover.emit(song.coverImage?.toComposeImageBitmap())
+    fun addToNext(localSongInfo: LocalSongInfo): Deferred<Unit> = scope.async {
+        // TODO: 2021/12/2 May not work correctly
+        val playIndex = orderList.getOrNull(orderIndex)
+        if (playIndex == null) {
+            playList.value = listOf(localSongInfo)
+        } else {
+            val tempList = playList.value.toMutableList()
+            for (i in tempList.size + 1..playIndex + 1) {
+                tempList[i] = tempList[i - 1]
             }
-            val current = MutableStateFlow(0L)
-            musicPlayer.setProgressListener { c, t ->
-                current.value = c
+            tempList[playIndex + 1] = localSongInfo
+            playList.value = tempList
+        }
+        parsePlayOrder()
+    }
+
+    fun removeFromPlayList(localSongInfo: LocalSongInfo) {
+        // TODO: 2021/12/1
+    }
+
+    fun replacePlayList(): Deferred<Unit> = scope.async {
+        playList.value = localSongList.value
+        parsePlayOrder()
+        orderIndex = 0
+        setSong()
+    }
+
+    fun replacePlayListAndPlay() = scope.async {
+        replacePlayList().await()
+        play().await()
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    private fun parsePlayOrder() {
+        val currentPlayingIndex = orderList.getOrElse(orderIndex) { 0 }
+        when (playMode.value) {
+            PlayMode.LIST, PlayMode.CYCLE, PlayMode.HEARTBEAT -> {
+                orderList = List(playList.value.size) { it }
+                orderIndex = currentPlayingIndex
             }
-            playingState.value = PlayingState(
-                songInfo = localSongInfo,
-                indexInPlayList = MutableStateFlow(0),
-                cover = cover,
-                currentTimeStampMillis = current,
-                isPlaying = MutableStateFlow(true)
-            )
-            musicPlayer.play()
+            PlayMode.SINGLE_CYCLE -> {
+                orderList = listOf(currentPlayingIndex) // Only contains current playing song
+                orderIndex = 0
+            }
+            PlayMode.RANDOM -> {
+                orderList = List(playList.value.size) { it }.shuffled()
+                orderIndex = orderList.first { it == currentPlayingIndex }
+            }
         }
     }
 
-    fun addAllToPlayList() {
-        // TODO: 2021/11/15 
-    }
-
-    fun addAllToPlayListAndPlay() {
-        // TODO: 2021/11/15
+    private fun isCycle(): Boolean {
+        return when (playMode.value) {
+            PlayMode.CYCLE, PlayMode.SINGLE_CYCLE -> true
+            else -> false
+        }
     }
 }

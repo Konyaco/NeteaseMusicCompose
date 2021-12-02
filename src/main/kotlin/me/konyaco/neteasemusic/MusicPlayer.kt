@@ -96,6 +96,8 @@ class MusicPlayer {
                         return@thread // Play end
                     }
                     if (frame.types.contains(Frame.Type.AUDIO)) {
+                        timeStamp = frame.timestamp
+                        listener.onProgress(frame.timestamp / 1000L, durationMillis)
                         val sample = frame.samples.firstOrNull() as? ShortBuffer
                             ?: return@thread // Play end
                         val byteBuffer = ByteBuffer.allocate(sample.capacity() * 2)
@@ -103,7 +105,6 @@ class MusicPlayer {
                             byteBuffer.putShort(sample.get(i))
                         }
                         soundLine.write(byteBuffer.array(), 0, byteBuffer.capacity())
-                        listener.onProgress(frame.timestamp / 1000L, durationMillis)
                     }
                 }
                 soundLine.close()

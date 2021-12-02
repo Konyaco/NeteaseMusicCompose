@@ -12,7 +12,7 @@ import me.konyaco.neteasemusic.ui.App
 import me.konyaco.neteasemusic.viewmodel.ViewModel
 
 fun main() = application {
-    val viewModel = remember { ViewModel() }
+    val viewModel = remember { ViewModel(MusicPlayer()) }
     Window(
         onCloseRequest = ::exitApplication,
         title = "网易云音乐",

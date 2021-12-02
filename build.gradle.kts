@@ -1,15 +1,14 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.5.31"
-    id("org.jetbrains.compose") version "1.0.0-beta6-dev455"
+    id("org.jetbrains.compose") version "1.0.0-rc6"
     id("org.bytedeco.gradle-javacpp-platform") version "1.5.6"
 }
 
 group = "me.konyaco.neteasemusic"
-version = "1.0.1"
+version = "1.0.2"
 
 repositories {
     google()

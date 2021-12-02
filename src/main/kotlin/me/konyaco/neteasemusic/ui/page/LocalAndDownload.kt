@@ -63,9 +63,9 @@ fun LocalAndDownload(viewModel: ViewModel) {
             // Play all songs button & Refresh button
             Row(verticalAlignment = Alignment.CenterVertically) {
                 PlayButton(onAddClick = {
-                    viewModel.addAllToPlayList()
+                    viewModel.replacePlayList()
                 }, onPlayClick = {
-                    viewModel.addAllToPlayListAndPlay()
+                    viewModel.replacePlayListAndPlay()
                 })
                 Spacer(Modifier.width(12.dp))
                 RefreshButton { viewModel.refreshSongList() }
@@ -74,7 +74,7 @@ fun LocalAndDownload(viewModel: ViewModel) {
             }
             Spacer(Modifier.height(16.dp))
             // Songs list
-            SongList(songs = songs, onSongSelect = { viewModel.addToPlaylist(it) })
+            SongList(songs = songs, onSongSelect = { viewModel.selectSong(it) })
         }
 
         VerticalScrollbar(
@@ -262,7 +262,8 @@ private fun Item(
     onDoubleClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.height(36.dp).combinedClickable(onClick = {}, onDoubleClick = onDoubleClick)
+        modifier = Modifier.height(36.dp)
+            .combinedClickable(onClick = {}, onDoubleClick = onDoubleClick)
             .background(if (index % 2 == 0) Color.Transparent else Color(0x05000000)),
         verticalAlignment = Alignment.CenterVertically
     ) {
